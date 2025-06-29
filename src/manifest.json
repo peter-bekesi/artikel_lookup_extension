@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "German Article Lookup",
+  "version": "1.0",
+  "description": "Double-click a German noun to see its article and plural.",
+  "permissions": ["scripting", "activeTab"],
+  "host_permissions": ["<all_urls>"],
+  "action": {
+  "default_title": "German Article Lookup"
+  },
+  "web_accessible_resources": [
+  {
+    "resources": ["dictionary.json"],
+    "matches": ["<all_urls>"]
+  }
+  ],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
+    }
+  ]
+}
