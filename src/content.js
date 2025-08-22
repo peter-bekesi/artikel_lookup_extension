@@ -32,15 +32,46 @@
         }
     });
 
-    function showPopup(word, x, y) {
+    function capitalizeFirstLetter(s) {
+        if (!s) return s;
+        return s.charAt(0).toUpperCase() + s.slice(1);
+    }
+
+    function getEntry(word) {
         const entry = dict[word];
+        if (entry) return {entry, stub: null};
+        for (i = word.length - 1; i > 1; i--) {
+            const stub = word.slice(-i);
+            const capitalizedStub = capitalizeFirstLetter(stub);
+            const entry = dict[capitalizedStub];
+            if (entry) return {entry, stub: capitalizedStub};
+        }
+        return {entry: null, stub: null};
+    }
+
+    //TODO case of plural is - in dictionary
+    //TODO no lookup if word is non-capitalized? --> only on marking but not on double click?
+    //TODO das T, das A etc should be removed
+    //TODO not in dictionary but -ung, -schaft, etc.
+    //TODO showPopup is run twice on double click? (based on logs)
+    //TODO 'Studierende' type of words
+    //TODO Dativ -n ending for nouns
+    //TODO settable popup time?
+
+    function showPopup(word, x, y) {
+        const {entry, stub} = getEntry(word);
         if (!entry) return;
         const [article, _plural, isPlural] = entry.split('|');
-        let plural = '';
+        let plural;
         if (isPlural === 'p') {
-            const temp = word;
-            word = _plural;
-            plural = temp;
+            if (stub) {
+                word = _plural;
+                plural = stub;
+            } else {
+                const temp = word;
+                word = _plural;
+                plural = temp;
+            }
         } else {
             plural = _plural;
         }
@@ -60,7 +91,7 @@
         });
 
         document.body.appendChild(popup);
-        setTimeout(() => popup.remove(), 3000);
+        setTimeout(() => popup.remove(), 2000);
     }
 
     document.addEventListener('dblclick', (event) => {

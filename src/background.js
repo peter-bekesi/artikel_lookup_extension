@@ -7,21 +7,17 @@ chrome.commands.onCommand.addListener(async (command) => {
 
         console.log("Dictionary popup toggled:", newState ? "ON" : "OFF");
 
-        // Optional: small feedback in the active tab
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-            if (tabs[0]) {
-                chrome.tabs.sendMessage(tabs[0].id, {
-                    type: "TOGGLE_POPUP",
-                    enabled: newState,
-                });
-            }
-            /*chrome.scripting.executeScript({
-                target: { tabId: tabs[0].id },
-                func: (enabled) => {
-                    console.log("Dictionary popup is now", enabled ? "ON" : "OFF");
-                },
-                args: [newState]
-            });*/
+            if (!tabs[0]) return;
+            chrome.tabs.sendMessage(tabs[0].id, {
+                type: "TOGGLE_POPUP",
+                enabled: newState
+            }, (_) => {
+                if (chrome.runtime.lastError) {
+                    // harmless on pages without content script
+                    console.log("No content script in this tab:", chrome.runtime.lastError.message);
+                }
+            });
         });
     }
 });
